@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="g" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22d3ee"/>
+      <stop offset="0.5" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="#0a101f" stroke="url(#g)" stroke-width="2"/>
+  <!-- bridge arches -->
+  <path d="M14 44 Q20 30 32 30 Q44 30 50 44" stroke="url(#g)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M20 44 Q25 35 32 35 Q39 35 44 44" stroke="url(#g)" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
+  <!-- deck -->
+  <path d="M12 44 H52" stroke="#e6ebf7" stroke-width="4" stroke-linecap="round"/>
+  <!-- signal dot -->
+  <circle cx="32" cy="22" r="4" fill="#34d399"/>
+  <circle cx="32" cy="22" r="8" stroke="#34d399" stroke-width="1.5" opacity="0.5"/>
+</svg>
