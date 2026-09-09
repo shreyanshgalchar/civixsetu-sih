@@ -4,6 +4,9 @@
   "version": "2.0.0",
   "type": "module",
   "description": "CivixSetu — SIH-grade civic resolution platform. Multilingual in, English summary out. AI triage, auto-department routing, citizen & officer workspaces.",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

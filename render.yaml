@@ -1,0 +1,21 @@
+# Render Blueprint — deploy CivixSetu as a STATIC SITE.
+# IMPORTANT: A Vite/React SPA must be a Static Site (runtime: static),
+# NOT a Web Service. This config makes Render build + serve dist/.
+services:
+  - type: web
+    name: civixsetu-sih
+    runtime: static
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    # SPA fallback: serve index.html for every route not matching a static file,
+    # so client-side routes like /citizen and /officer never 404 on refresh.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    # Long-lived cache for hashed assets (immutable).
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
