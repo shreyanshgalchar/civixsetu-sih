@@ -86,6 +86,27 @@ Listen/Speak  -> detect script+language   -> translate to an English summary
 - **Voice input** via Web Speech API (12 language tags).
 - **GPS auto-locate** + landmark & ward auto-detection (fallback to manual)
 - Priority score, SLA steering, and a human-verified officer workflow.
+- **Setu HelpBot** (`src/lib/helpbot.ts`) — an offline rule-based assistant with
+  department-aware intents, quick-reply chips, deep-link actions, and a 👍/👎
+  **feedback** control that persists to a durable log (`civixsetu.bot.v1`).
+
+### 6. Real photos + richer informatics
+- **17 illustrative civic photos** in `public/assets/photo` (potholes, garbage,
+  streetlights, water, drains, parks, traffic, stray cattle, city hero) shared via
+  `deptPhoto()`/`deptHeroPhoto()`/`CITY_PHOTO`.
+- Reports carry a `photo` + `extraPhotos`; the **report card** shows a photo cover
+  with hover-zoom, the **report detail** shows a gallery, the **officer queue** shows
+  thumbnails, and the **departments grid** uses photo banners.
+
+### 7. Professional polish (3D + glass)
+- Reinforced design system: `glass`, `glass-strong`, `halo`, `shimmer-border`,
+  `depth`, `cover-zoom`, `glow-dot`, `tabbar` + existing tilt/scan/orb/reveal/typewriter.
+- **Citizen Overview**: impact/footer strip, "trending near you" photo cards,
+  contribution sparkline + resolved %, karma/streak chips.
+- **Track page**: photo evidence strip + 5-star rate-resolution control.
+- **Officer Dashboard**: morning briefing strip, Setu AI recommendations (crew + ETA),
+  department-health bars, weekly reported-vs-resolved chart, SLA-breach-risk table,
+  photo-thumbnailed priority queue.
 
 ---
 
