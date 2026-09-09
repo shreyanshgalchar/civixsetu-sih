@@ -342,3 +342,53 @@ ul, ol { list-style: none; }
 .tagline { letter-spacing: 0.02em; }
 
 @media print { .nav,.toast-wrap { display: none; } }
+
+/* ============ Enhanced glass + 3D depth ============ */
+.glass {
+  background: linear-gradient(150deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+}
+.glass-strong { background: linear-gradient(150deg, rgba(18,28,48,0.9), rgba(10,16,31,0.82)); backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.09); }
+
+/* 3D floating depth */
+.depth { box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 20px 60px rgba(2,6,23,0.6), 0 6px 20px rgba(2,6,23,0.5); }
+.depth-strong { box-shadow: 0 2px 0 rgba(255,255,255,0.09) inset, 0 40px 90px rgba(2,6,23,0.7), 0 12px 40px rgba(2,6,23,0.55); }
+
+/* ring / halo behind 3D cards */
+.halo { position: relative; }
+.halo::after {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; z-index: -1;
+  background: radial-gradient(80% 80% at 50% 0%, rgba(34,211,238,0.25), transparent 70%);
+  filter: blur(22px); opacity: 0; transition: opacity .4s;
+}
+.halo:hover::after { opacity: 1; }
+
+/* animated conic border shimmer */
+.shimmer-border { position: relative; overflow: hidden; }
+.shimmer-border::before {
+  content: ""; position: absolute; inset: -2px; border-radius: inherit; z-index: -1;
+  background: conic-gradient(from 0deg, transparent 0%, rgba(34,211,238,0.5) 12%, transparent 26%, transparent 50%, rgba(139,92,246,0.5) 62%, transparent 76%);
+  animation: spin-border 6s linear infinite;
+  opacity: 0.7;
+}
+@keyframes spin-border { to { transform: rotate(360deg); } }
+
+/* floating chips / badges */
+.float-chip { animation: float 6s ease-in-out infinite; }
+
+/* photo card cover hover */
+.cover-zoom { overflow: hidden; }
+.cover-zoom img { transform-origin: center; }
+.card:hover .cover-zoom img, .tilt:hover .cover-zoom img { transform: scale(1.08); }
+
+/* pill tab underline */
+.tabbar { display: inline-flex; gap: 4; padding: 4; border-radius: 999px; background: rgba(7,11,21,0.5); border: 1px solid var(--line); }
+.tabbar .tab { padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--muted); transition: all .2s; }
+.tabbar .tab.on { background: var(--grad-cta); color: #04121a; }
+
+/* glow dot */
+.glow-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; box-shadow: 0 0 12px currentColor; }
+
+input[type="range"] { accent-color: var(--primary); }

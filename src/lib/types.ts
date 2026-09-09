@@ -58,7 +58,11 @@ export interface Report {
   lng?: number;
   photos: string[];          // data-uri thumbnails
   audio?: string;            // data-uri
+  photo?: string;            // featured image url (illustrative)
+  extraPhotos?: string[];
   upvotes: number;
+  assignNote?: string;       // officer escalation / SLA note
+  citizenRating?: number;    // 0-5
   assignedTo?: string;       // officer name
   assignedOfficerId?: string;
   resolvedBy?: string;

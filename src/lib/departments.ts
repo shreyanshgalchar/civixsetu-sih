@@ -165,4 +165,23 @@ export const DEPT_META: Record<string, { ic: string; color: string }> = Object.f
   DEPARTMENTS.map((d) => [d.id, { ic: d.ic, color: d.color }])
 );
 
+// Illustrative photos served from /assets/photo (see CREDITS.md).
+// Each department has a 2-photo pool; reports cycle through for variety.
+export const DEPT_PHOTOS: Record<string, string[]> = {
+  roads: ["/assets/photo/roads-1.jpg", "/assets/photo/roads-2.jpg"],
+  sanitation: ["/assets/photo/garbage-1.jpg", "/assets/photo/garbage-2.jpg"],
+  streetlights: ["/assets/photo/lights-1.jpg", "/assets/photo/lights-2.jpg"],
+  water: ["/assets/photo/water-1.jpg", "/assets/photo/water-2.jpg"],
+  drainage: ["/assets/photo/drain-1.jpg", "/assets/photo/drain-2.jpg"],
+  parks: ["/assets/photo/parks-1.jpg", "/assets/photo/parks-2.jpg"],
+  traffic: ["/assets/photo/traffic-1.jpg", "/assets/photo/traffic-2.jpg"],
+  animals: ["/assets/photo/animals-1.jpg", "/assets/photo/animals-2.jpg"],
+};
+export const CITY_PHOTO = "/assets/photo/city-hero.jpg";
+export const deptPhoto = (id: string, salt = 0) => {
+  const pool = DEPT_PHOTOS[id] || DEPT_PHOTOS.roads;
+  return pool[Math.abs(salt) % pool.length];
+};
+export const deptHeroPhoto = (id: string) => DEPT_PHOTOS[id]?.[0] || CITY_PHOTO;
+
 export const defaultDept = getDept("roads");

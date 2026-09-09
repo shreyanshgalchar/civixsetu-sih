@@ -1,5 +1,5 @@
 import type { User, Report, ReportStatus, Severity, TimelineEvent } from "./types";
-import { getDept } from "./departments";
+import { getDept, DEPT_PHOTOS } from "./departments";
 import { analyze } from "./aiEngine";
 
 const now = Date.now();
@@ -119,6 +119,8 @@ function buildReport(s: S, idx: number): Report {
     ward: s.ward, city: s.city,
     lat: 17.4 + Math.random() * 0.4, lng: 78.4 + Math.random() * 0.4,
     photos: [],
+    photo: DEPT_PHOTOS[dpt]?.[idx % DEPT_PHOTOS[dpt].length],
+    extraPhotos: (DEPT_PHOTOS[dpt] || []).slice(1, 2),
     upvotes: s.upvotes + (Math.random() * 200 | 0),
     assignedTo: assigned,
     resolvedBy: assigned,

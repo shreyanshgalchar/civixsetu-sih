@@ -40,6 +40,8 @@ export const IconCircleCheck = (p: P) => (<svg {...base(p)}><circle cx="12" cy="
 export const IconTarget = (p: P) => (<svg {...base(p)}><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>);
 export const IconSliders = (p: P) => (<svg {...base(p)}><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2" fill="#070b15"/><circle cx="15" cy="12" r="2" fill="#070b15"/><circle cx="7" cy="18" r="2" fill="#070b15"/></svg>);
 export const IconFlame = (p: P) => (<svg {...base(p)}><path d="M12 3c.5 3-2 4.5-2 7a4 4 0 0 0 8 0c0-1.5-.5-2.5-1.5-3.5 0 2-2 2.5-2 2.5 1-2 0-4-2.5-6z"/><path d="M12 21a6 6 0 0 0 6-6c0-1-.3-2-.8-2.9M12 21a6 6 0 0 1-6-6c0-2 .8-3.8 2.1-5.1"/></svg>);
+export const IconStar = (p: P) => (<svg {...base(p)} fill="currentColor"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z"/><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z" fill="none"/></svg>);
+export const IconHeart = (p: P) => (<svg {...base(p)}><path d="M12 20s-7-4.4-9-9c-1.1-2.7.5-6 3.6-6C9 5 11 7 12 8c1-1 3-3 5.4-3 3.1 0 4.7 3.3 3.6 6-2 4.6-9 9-9 9z"/></svg>);
 
 /* department icons keyed by the ic field */
 export const DeptIcon = ({ ic, ...p }: P & { ic: string }) => {

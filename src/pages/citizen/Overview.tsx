@@ -1,11 +1,10 @@
-import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageTitle } from "../../components/AppShell";
 import { Avatar, KPI, Sev, StatusBadge, Reveal } from "../../components/ui";
-import { IconMegaphone, IconCheck, IconClock, IconBolt, IconSpark, IconChevR, IconTrend } from "../../components/Icons";
+import { IconMegaphone, IconCheck, IconClock, IconBolt, IconSpark, IconChevR, IconTrend, IconHeart, IconUsers, IconShield, IconGlobe } from "../../components/Icons";
 import { useStore, useCurrentUser, computeMetrics } from "../../lib/hooks";
-import { formatNum, pickColor } from "../../lib/format";
-import { getDept } from "../../lib/departments";
+import { formatNum, pickColor, assetUrl } from "../../lib/format";
+import { getDept, deptPhoto } from "../../lib/departments";
 import { Sparkline } from "../../components/Charts";
 import { store } from "../../lib/store";
 
@@ -16,35 +15,35 @@ export default function CitizenOverview() {
   const nav = useNavigate();
   const state = useStore();
   const mine = state.reports.filter((r) => r.citizenId === user.id);
-  const all = computeMetrics(state.reports);
   const myStats = computeMetrics(mine);
-
-  const recent = [...mine].sort((a, b) => b.created - a.created).slice(0, 5);
+  const recent = [...mine].sort((a, b) => b.created - a.created);
+  const topRated = [...state.reports].sort((a, b) => b.upvotes - a.upvotes).slice(0, 3);
+  const resolvedPct = myStats.total ? Math.round((myStats.resolved / myStats.total) * 100) : 0;
 
   return (
     <div>
       <PageTitle eyebrow="Citizen workspace" title={<>Namaste, <span className="grad-text">{user.name.split(" ")[0]}</span> 👋</>} sub="Your city is made of small fixes by people like you. Keep reporting." />
       <div className="row gap-2 wrap mb-3">
-        <div className="row gap-2">
+        <div className="row gap-2 glass-strong" style={{ padding: "8px 14px 8px 8px", borderRadius: 999 }}>
           <Avatar name={user.name} color={user.avatarColor} />
           <div>
             <div className="row gap-1"><b>🔥 {user.streak}-day streak</b><span className="chip st">{formatNum(user.karma)} karma</span></div>
             <div className="faint" style={{ fontSize: 12.5 }}>{user.ward}, {user.city} · {user.verifiedCount} verified reports</div>
           </div>
         </div>
-        <button className="btn btn-primary right" onClick={() => nav("/citizen/report")}><IconMegaphone size={17} /> New report</button>
+        <button className="btn btn-primary right shimmer-border" onClick={() => nav("/citizen/report")}><IconMegaphone size={17} /> New report</button>
       </div>
 
-      {/* KPIs */}
+      {/* KPI row */}
       <div className="g4">
         <KPI icon={<IconMegaphone />} value={String(myStats.total)} label="My reports" color="#22d3ee" />
         <KPI icon={<IconCheck />} value={String(myStats.resolved)} label="Resolved" color="#34d399" />
-        <KPI icon={<IconClock />} value={myStats.avgDays.toFixed(1)} label="Avg. days to resolve" color="#fbbf24" />
-        <KPI icon={<IconBolt />} value={String(myStats.totalUpvotes)} label="Community votes" color="#8b5cf6" />
+        <KPI icon={<IconClock />} value={myStats.avgDays.toFixed(1)} label="Avg. days" color="#fbbf24" />
+        <KPI icon={<IconBolt />} value={String(myStats.totalUpvotes)} label="Votes earned" color="#8b5cf6" />
       </div>
 
-      {/* hero action */}
-      <Reveal><div className="card card-glow mt-4" style={{ padding: "30px", background: "radial-gradient(80% 140% at 10% 10%, rgba(34,211,238,0.16), rgba(8,13,26,0.5))" }}>
+      {/* hero action + trend */}
+      <Reveal><div className="card card-glow shimmer-border mt-4" style={{ padding: "30px", background: "radial-gradient(80% 140% at 10% 10%, rgba(34,211,238,0.16), rgba(8,13,26,0.6))" }}>
         <div className="row-between wrap gap-3">
           <div style={{ maxWidth: 460 }}>
             <div className="row gap-1 mb-2"><IconSpark size={18} color="#22d3ee" /><span className="h-md">Describe it. Setu AI routes it.</span></div>
@@ -52,14 +51,41 @@ export default function CitizenOverview() {
             <div className="row gap-2 wrap mt-3">
               <button className="btn btn-primary" onClick={() => nav("/citizen/report")}><IconMegaphone size={17} /> Start a report</button>
               <button className="btn btn-ghost" onClick={() => nav("/citizen/analytics")}><IconTrend size={16} /> City pulse</button>
+              <button className="btn btn-ghost" onClick={() => nav("/citizen/leaderboard")}><IconUsers size={16} /> Leaderboard</button>
             </div>
           </div>
-          <div style={{ minWidth: 260 }}>
-            <div className="row-between mb-1"><span className="faint" style={{ fontSize: 12 }}>Your contribution trend</span><span className="chip st-RESOLVED">▲ active</span></div>
+          <div style={{ minWidth: 260, textAlign: "right" }}>
+            <div className="row-between mb-1"><span className="faint" style={{ fontSize: 12 }}>Your contribution</span><span className="chip st-RESOLVED">▲ active</span></div>
             <Sparkline data={spark} color="#22d3ee" w={280} h={70} />
+            <div className="row gap-1 wrap" style={{ justifyContent: "flex-end", marginTop: 6 }}>
+              <span className="chip st"><IconShield size={11} /> {resolvedPct}% resolved</span>
+              <span className="chip st"><IconBolt size={11} /> streak {user.streak}d</span>
+            </div>
           </div>
         </div>
       </div></Reveal>
+
+      {/* trending in your city */}
+      <div className="row-between mt-4 mb-2">
+        <h3 className="h-md">Trending near you</h3>
+        <button className="btn btn-ghost btn-sm" onClick={() => nav("/citizen/analytics")}>View city <IconChevR size={14} /></button>
+      </div>
+      <div className="g3">
+        {topRated.map((r) => {
+          const d = getDept(r.departmentId);
+          return (
+            <Reveal key={r.id}><div className="card card-hover" style={{ padding: 0, overflow: "hidden", position: "relative" }}>
+              <img src={assetUrl(deptPhoto(r.departmentId, r.created))} alt="" loading="lazy" style={{ width: "100%", height: 120, objectFit: "cover" }} />
+              <div style={{ position: "absolute", top: 10, right: 10 }}><StatusBadge s={r.status} /></div>
+              <div style={{ padding: "14px 16px" }}>
+                <div className="row gap-1 wrap"><Sev s={r.severity} /><span className="chip st">▲ {formatNum(r.upvotes)}</span><span className="faint" style={{ fontSize: 11.5 }}><IconGlobe size={11} /> {r.lang}</span></div>
+                <div style={{ fontWeight: 600, fontSize: 14, marginTop: 6, lineHeight: 1.35 }}>{r.englishSummary}</div>
+                <button className="btn btn-ghost btn-sm" style={{ marginTop: 10 }} onClick={() => nav(`/citizen/track/${r.id}`)}>Track {r.id} <IconChevR size={13} /></button>
+              </div>
+            </div></Reveal>
+          );
+        })}
+      </div>
 
       {/* recent reports */}
       <div className="row-between mt-4 mb-2">
@@ -74,23 +100,35 @@ export default function CitizenOverview() {
           <button className="btn btn-primary mt-3" onClick={() => nav("/citizen/report")}>File a report</button>
         </div>
       ) : (
-        <div style={{ display: "grid", gap: 10 }}>
-          {recent.map((r) => {
+        <div className="g3">
+          {recent.slice(0, 6).map((r) => {
             const d = getDept(r.departmentId);
             return (
-              <button key={r.id} className="card card-hover row" style={{ width: "100%", textAlign: "left", gap: 16 }} onClick={() => nav(`/citizen/track/${r.id}`)}>
-                <div className="avatar-chip" style={{ borderRadius: 12, background: `${d.color}1e`, color: d.color, display: "grid", placeItems: "center", flexShrink: 0 }}><IconBolt size={20} /></div>
-                <div style={{ minWidth: 0, flex: 1 }}>
-                  <div className="row gap-1 wrap"><span className="mono faint" style={{ fontSize: 11.5 }}>{r.id}</span><Sev s={r.severity} /><StatusBadge s={r.status} /></div>
-                  <div style={{ fontWeight: 600, fontSize: 14, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.englishSummary}</div>
-                  <div className="faint" style={{ fontSize: 12 }}>{r.departmentName} · {r.location || r.landmark}</div>
+              <Reveal key={r.id} delay={80}><button key={r.id} className="card card-hover" style={{ width: "100%", textAlign: "left", padding: 0, overflow: "hidden" }} onClick={() => nav(`/citizen/track/${r.id}`)}>
+                <div style={{ position: "relative", height: 110 }}>
+                  <img src={assetUrl(deptPhoto(r.departmentId, r.created))} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, transparent 40%, rgba(7,11,21,0.85))" }} />
+                  <div style={{ position: "absolute", bottom: 8, left: 12 }}><span className="chip st">{d.short}</span></div>
                 </div>
-                <IconChevR size={18} style={{ color: "#64708a", flexShrink: 0 }} />
-              </button>
+                <div style={{ padding: "13px 16px" }}>
+                  <div className="row gap-1 wrap" style={{ fontSize: 11 }}><span className="mono faint">{r.id}</span><Sev s={r.severity} /><StatusBadge s={r.status} /></div>
+                  <div style={{ fontWeight: 600, fontSize: 14, marginTop: 5, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.englishSummary}</div>
+                  <div className="row-between mt-2"><span className="faint" style={{ fontSize: 11.5 }}>{r.location || r.landmark}</span><IconChevR size={15} style={{ color: "#64708a" }} /></div>
+                </div>
+              </button></Reveal>
             );
           })}
         </div>
       )}
+
+      {/* impact footer */}
+      <Reveal><div className="card glass-strong mt-4 row-between wrap gap-2" style={{ padding: 22 }}>
+        <div className="row gap-2"><div className="kpi ic" style={{ background: "rgba(244,63,94,0.14)", color: "#fb7185" }}><IconHeart size={22} /></div>
+          <div><div className="h-md" style={{ fontSize: 16 }}>You're making a difference</div>
+          <div className="faint" style={{ fontSize: 13 }}>Every verified report helps your ward climb the Swachh ranking — keep it up!</div></div>
+        </div>
+        <div className="row gap-2 wrap"><span className="chip st">🏅 {formatNum(user.karma)} karma</span><span className="chip st">🔥 {user.streak}d streak</span><button className="btn btn-outline btn-sm" onClick={() => nav("/citizen/leaderboard")}>See leaderboard</button></div>
+      </div></Reveal>
     </div>
   );
 }

@@ -3,13 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { Navbar, Footer } from "../components/SiteChrome";
 import { SectionHead, Reveal, Tilt, KPI, Avatar } from "../components/ui";
 import { DeptIcon, IconMic, IconSpark, IconChevR, IconCheck, IconPin } from "../components/Icons";
-import { DEPARTMENTS } from "../lib/departments";
+import { DEPARTMENTS, deptHeroPhoto } from "../lib/departments";
 import { useStore, computeMetrics, reportedVsResolved, byDepartment } from "../lib/hooks";
 import { ReportCard } from "../components/ReportCard";
 import { ReportDetail } from "../components/ReportDetail";
-import { BarChart, DonutChart, HeatGrid } from "../components/Charts";
+import { BarChart, DonutChart, HeatGrid, Sparkline } from "../components/Charts";
 import { LandingDemo } from "../components/LandingDemo";
-import { pickColor, formatNum } from "../lib/format";
+import { pickColor, formatNum, assetUrl } from "../lib/format";
+import { CITY_PHOTO } from "../lib/departments";
+import HelpBot from "../components/HelpBot";
 
 const WARDS = [
   { id: "AW", label: "Andheri W", sub: "Mumbai", value: 92 }, { id: "KO", label: "Koramangala", sub: "Bengaluru", value: 78 },
@@ -38,7 +40,7 @@ function Counter({ to, suffix = "", dur = 1400 }: { to: number; suffix?: string;
 
 function HeroMock() {
   return (
-    <Tilt max={10} className="card card-glow" style={{ width: 340, padding: 0, overflow: "hidden", background: "rgba(8,13,26,0.7)" }}>
+    <Tilt max={9} className="card card-glow" style={{ width: 350, padding: 0, overflow: "hidden", background: "rgba(8,13,26,0.78)", backdropFilter: "blur(14px)" }}>
       <div style={{ padding: "16px 18px", borderBottom: "1px solid var(--line)", display: "flex", alignItems: "center", gap: 10 }}>
         <span className="chip st">● LIVE</span><span className="row gap-1 right faint" style={{ fontSize: 12 }}><IconSpark size={14} color="#22d3ee" /> Setu AI scanning</span>
       </div>
@@ -83,9 +85,13 @@ export default function Landing() {
       <Navbar />
 
       {/* ============================ HERO ============================ */}
-      <section className="hero">
-        <div className="hero-bg" /><div className="grid-bg" />
-        <div className="orb" style={{ width: 300, height: 300, left: "8%", top: "12%", background: "rgba(34,211,238,0.2)" }} />
+      <section className="hero" style={{ minHeight: 98 }}>
+        <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+          <img src={assetUrl(CITY_PHOTO)} alt="City skyline" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.5 }} />
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(7,11,21,0.72), rgba(7,11,21,0.9))" }} />
+        </div>
+        <div className="hero-bg" style={{ opacity: 0.6 }} /><div className="grid-bg" />
+        <div className="orb" style={{ width: 300, height: 300, left: "8%", top: "12%", background: "rgba(34,211,238,0.25)" }} />
         <div className="orb" style={{ width: 360, height: 360, right: "6%", top: "6%", background: "rgba(139,92,246,0.22)" }} />
         <div className="container" style={{ position: "relative", zIndex: 2 }}>
           <div className="two-col" style={{ gridTemplateColumns: "1.12fr 1fr", alignItems: "center" }}>
@@ -166,14 +172,20 @@ export default function Landing() {
           <SectionHead center eyebrow="Every civic pain-point, covered" title={<>8 departments. <span className="grad-text">One bridge.</span></>} sub="Setu AI classifies every report in ~8 seconds and routes it to the exact desk — no wrong queues, no lost complaints." />
           <div className="g4 mt-4">
             {DEPARTMENTS.map((d, i) => (
-              <Reveal key={d.id} delay={i * 70}><Tilt max={7} className="card card-hover" style={{ height: "100%", borderLeft: `3px solid ${d.color}` }}>
-                <div className="row-between mb-2">
-                  <div className="avatar-chip" style={{ borderRadius: 13, background: `${d.color}1a`, color: d.color, display: "grid", placeItems: "center" }}><DeptIcon ic={d.ic} size={24} /></div>
-                  <span className="chip st">{formatNum(deptCount[d.id] || 0)} reports</span>
+              <Reveal key={d.id} delay={i * 70}><Tilt max={8} className="card card-hover" style={{ height: "100%", padding: 0, overflow: "hidden" }}>
+                <div style={{ position: "relative", height: 104, overflow: "hidden" }}>
+                  <div className="cover-zoom" style={{ position: "absolute", inset: 0 }}><img src={assetUrl(deptHeroPhoto(d.id))} alt={d.short} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>
+                  <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, ${d.color}44, rgba(7,11,21,0.88))` }} />
+                  <div style={{ position: "absolute", top: 10, left: 12, display: "flex", alignItems: "center", gap: 8 }}>
+                    <div className="avatar-chip" style={{ borderRadius: 10, background: "rgba(7,11,21,0.7)", color: d.color, display: "grid", placeItems: "center", width: 38, height: 38, backdropFilter: "blur(6px)" }}><DeptIcon ic={d.ic} size={22} /></div>
+                    <b style={{ textShadow: "0 1px 8px rgba(0,0,0,.7)" }}>{d.short}</b>
+                  </div>
+                  <span className="chip st" style={{ position: "absolute", top: 10, right: 12 }}>{formatNum(deptCount[d.id] || 0)} reports</span>
                 </div>
-                <div className="h-md" style={{ fontSize: 16 }}>{d.short}</div>
-                <div className="faint" style={{ fontSize: 12.5, marginTop: 2 }}>{d.name}</div>
-                <p className="muted mt-1" style={{ fontSize: 12.5, minHeight: 34 }}>{d.desc}</p>
+                <div style={{ padding: "14px 16px" }}>
+                  <div className="faint" style={{ fontSize: 12.5 }}>{d.name}</div>
+                  <p className="muted mt-1" style={{ fontSize: 12.5 }}>{d.desc}</p>
+                </div>
               </Tilt></Reveal>
             ))}
           </div>
@@ -288,6 +300,7 @@ export default function Landing() {
       <Footer />
 
       {selected && <ReportDetail report={selected} onClose={() => setSel(null)} role="citizen" />}
+      <HelpBot onClose={() => {}} />
     </div>
   );
 }

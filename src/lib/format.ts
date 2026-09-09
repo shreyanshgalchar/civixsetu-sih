@@ -42,3 +42,11 @@ export function pickColor(seed: string): string {
   for (const c of seed) h = (h * 33 + c.charCodeAt(0)) | 0;
   return colors[Math.abs(h) % colors.length];
 }
+
+// Resolve an app asset to an absolute URL (works whether served from / or a subdir).
+export function assetUrl(p?: string): string | undefined {
+  if (!p) return undefined;
+  if (/^https?:/.test(p)) return p;
+  // Vite copies /public/* to the site root; base is '/' so '/assets/...' is correct.
+  return p;
+}

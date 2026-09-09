@@ -1,7 +1,7 @@
 import type { AppState, Report, ReportStatus, TimelineEvent, User } from "./types";
 import { SEED_USERS, seedReports } from "./seed";
 import { analyze } from "./aiEngine";
-import { getDept } from "./departments";
+import { getDept, DEPT_PHOTOS } from "./departments";
 
 const KEY = "civixsetu.state.v2";
 
@@ -98,6 +98,9 @@ export const store = {
       ward: input.ward, city: input.city,
       lat: input.lat, lng: input.lng,
       photos: input.photo || [], audio: input.audio,
+      // illustrative featured photo for this department's issue
+      photo: DEPT_PHOTOS[deptId]?.[state.reports.length % DEPT_PHOTOS[deptId].length],
+      extraPhotos: (DEPT_PHOTOS[deptId] || []).slice(1, 2),
       upvotes: 0,
       created: now, updated: now,
       timeline: [
@@ -160,6 +163,24 @@ export const store = {
     persist(); emit();
   },
 
+  rateResolution(id: string, rating: number) {
+    state = { ...state, reports: state.reports.map((r) => r.id === id ? { ...r, citizenRating: rating } : r) };
+    persist(); emit();
+  },
+
+  setAssignNote(id: string, note: string) {
+    state = { ...state, reports: state.reports.map((r) => r.id === id ? { ...r, assignNote: note } : r) };
+    persist(); emit();
+  },
+
+  /* HelpBot feedback + insights are kept in a lightweight, durable log */
+  addBotFeedback(q: string, a: string, liked: boolean) {
+    const log = botFeedbackLog();
+    log.unshift({ q, a, liked, ts: Date.now() });
+    try { localStorage.setItem(KEY_BOT, JSON.stringify(log.slice(0, 200))); } catch { /* ignore */ }
+    emit();
+  },
+
   reset() {
     localStorage.removeItem(KEY);
     state = { users: SEED_USERS, reports: seedReports(), sessionId: "u-citizen", analytics: { lastTrained: Date.now(), modelVersion: "SetuAI · v2.4 (offline)", accuracy: 96.8 } };
@@ -172,3 +193,10 @@ export const store = {
 
 import type { Role } from "./types";
 export { Role };
+
+/* --------- HelpBot feedback log (durable, stored separately) --------- */
+const KEY_BOT = "civixsetu.bot.v1";
+export interface BotFeedback { q: string; a: string; liked: boolean; ts: number }
+export function botFeedbackLog(): BotFeedback[] {
+  try { return JSON.parse(localStorage.getItem(KEY_BOT) || "[]"); } catch { return []; }
+}

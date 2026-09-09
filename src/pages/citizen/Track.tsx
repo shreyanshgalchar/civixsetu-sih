@@ -2,19 +2,19 @@ import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PageTitle } from "../../components/AppShell";
 import { Avatar, Sev, StatusBadge } from "../../components/ui";
-import { DeptIcon, IconBolt, IconPin, IconClock, IconGlobe, IconCheck } from "../../components/Icons";
+import { DeptIcon, IconBolt, IconPin, IconClock, IconGlobe, IconCheck, IconCamera } from "../../components/Icons";
 import { useStore } from "../../lib/hooks";
 import { store } from "../../lib/store";
-import { getDept } from "../../lib/departments";
-import { hoursAgo, pickColor, formatNum, daysBetween } from "../../lib/format";
+import { getDept, deptPhoto } from "../../lib/departments";
+import { hoursAgo, pickColor, formatNum, daysBetween, assetUrl } from "../../lib/format";
 import { Ring, Sparkline } from "../../components/Charts";
+import { RateResolution } from "../../components/ReportDetail";
 
 export default function Track() {
   const { id } = useParams();
   const nav = useNavigate();
   const state = useStore();
   const rep = state.reports.find((r) => r.id === id);
-  const [open, setOpen] = useState(true);
 
   if (!rep) return <div className="card center" style={{ padding: "60px" }}><h3 className="h-md">Report not found</h3><button className="btn btn-primary mt-3" onClick={() => nav("/citizen/reports")}>Back to my reports</button></div>;
 
@@ -27,6 +27,16 @@ export default function Track() {
     <div style={{ maxWidth: 1040, margin: "0 auto" }}>
       <PageTitle eyebrow="Live tracking" title={rep.id} sub={`Reported by ${rep.citizenName} · ${rep.ward}, ${rep.city}`} right={<button className="btn btn-ghost btn-sm" onClick={() => nav("/citizen/reports")}>← Back</button>} />
 
+      {/* photo strip */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 16, overflowX: "auto" }}>
+        {[deptPhoto(rep.departmentId, rep.created), ...(rep.extraPhotos || [])].map((p, i) => (
+          <div key={i} style={{ width: 150, height: 100, borderRadius: 14, overflow: "hidden", flexShrink: 0, border: "1px solid var(--line)", position: "relative" }}>
+            <img src={assetUrl(p)} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            {i === 0 && <span className="chip st" style={{ position: "absolute", top: 6, left: 6 }}><IconCamera size={11} /> evidence</span>}
+          </div>
+        ))}
+      </div>
+
       <div className="card card-glow mb-3" style={{ padding: 26 }}>
         <div className="row-between wrap gap-2 mb-3">
           <div className="row gap-2">
@@ -36,7 +46,7 @@ export default function Track() {
               <div className="row gap-1 wrap mt-1"><StatusBadge s={rep.status} /><Sev s={rep.severity} /><span className="chip st"><IconClock size={12} /> SLA {rep.slaDays}h</span><span className="chip st"><IconBolt size={12} /> {rep.priorityScore} priority</span></div>
             </div>
           </div>
-          <button className={`btn ${rep.upvotes && open ? "btn-primary" : "btn-outline"}`} onClick={() => store.upvote(rep.id)}>▲ Upvote · {formatNum(rep.upvotes)}</button>
+          <button className={"btn-primary"} onClick={() => store.upvote(rep.id)}>▲ Upvote · {formatNum(rep.upvotes)}</button>
         </div>
 
         <div className="row gap-1 faint mb-3" style={{ fontSize: 13 }}><IconPin size={14} style={{ color: "#fbbf24" }} /> {rep.location || rep.landmark}</div>
@@ -91,6 +101,16 @@ export default function Track() {
           </div>
         </div>
       </div>
+
+      {rep.status === "RESOLVED" && (
+        <div className="card mt-3" style={{ borderLeft: "3px solid #34d399" }}>
+          <div className="row-between wrap gap-2 mb-1">
+            <div className="row gap-1"><IconCheck size={16} style={{ color: "#6ee7b7" }} /><b>Resolution quality</b></div>
+            <span className="faint" style={{ fontSize: 12 }}>Your feedback helps the department improve</span>
+          </div>
+          <RateResolution report={rep} />
+        </div>
+      )}
     </div>
   );
 }

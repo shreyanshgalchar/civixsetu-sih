@@ -5,6 +5,7 @@ import { Avatar } from "./ui";
 import { useCurrentUser } from "../lib/hooks";
 import { store } from "../lib/store";
 import { cls } from "../lib/format";
+import HelpBot from "./HelpBot";
 import {
   IconHome, IconMegaphone, IconBar, IconGrid, IconShield, IconUsers, IconLogout, IconSpark, IconClock, IconSearch,
 } from "./Icons";
@@ -100,6 +101,7 @@ export function AppShell({ role, children }: { role: "citizen" | "officer"; chil
           </aside>
           <main className="anim-page" style={{ minWidth: 0 }}>{children}</main>
         </div>
+        <HelpBot onClose={() => {}} />
       </div>
     </div>
   );
